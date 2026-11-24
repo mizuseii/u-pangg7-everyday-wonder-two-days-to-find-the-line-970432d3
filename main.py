@@ -33,6 +33,13 @@ def main() -> None:
         f.write(ENTRY)
         tmp_path = f.name
     os.replace(tmp_path, path)
+    # Verify the write round-tripped exactly: the file must hold the
+    # entry byte-for-byte, with no trailing newline and ASCII only,
+    # so a partial or recoded write can never pass silently.
+    with open(path, "r", encoding="utf-8", newline="") as f:
+        written = f.read()
+    assert written == ENTRY, "entry.txt does not match ENTRY"
+    assert written.isascii(), "entry must be ASCII"
 
 
 if __name__ == "__main__":
